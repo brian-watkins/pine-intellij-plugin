@@ -1,0 +1,25 @@
+<idea-plugin version="2">
+  <id>org.pine.plugin.PineSpecPlugin</id>
+  <name>PineSpecPlugin</name>
+  <version>1.0</version>
+  <vendor email="" url="https://github.com/bwatkinsPivotal/pine-intellij-plugin">Brian Watkins</vendor>
+
+  <description><![CDATA[
+      Support for running pine specs based on context.
+    ]]></description>
+
+  <change-notes><![CDATA[
+
+    ]]>
+  </change-notes>
+
+  <idea-version since-build="143.0"/>
+
+  <depends>org.intellij.groovy</depends>
+  <depends>org.jetbrains.plugins.gradle</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <runConfigurationProducer implementation="org.pine.plugin.PineSpecRunConfigurationProducer" order="first" />
+  </extensions>
+
+</idea-plugin>

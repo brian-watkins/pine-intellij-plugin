@@ -1,0 +1,6 @@
+pine.iml
+.idea
+build/
+.gradle
+.class
+pine-intellij-plugin.*
