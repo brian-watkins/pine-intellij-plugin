@@ -15,10 +15,13 @@ import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.PsiTestUtil;
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import groovy.lang.GroovyObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.gradle.settings.GradleSystemRunningSettings;
+import org.pine.SpecRunner;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,9 +101,21 @@ public class RunConfigurationTest extends LightPlatformCodeInsightFixtureTestCas
 
             GradleSystemRunningSettings.getInstance().setPreferredTestRunner(GradleSystemRunningSettings.PreferredTestRunner.GRADLE_TEST_RUNNER);
 
-            PsiTestUtil.addLibrary(module, model, "pine-1.0-SNAPSHOT.jar", "/Users/bwatkins/work/pine-intellij-plugin/lib", "pine-1.0-SNAPSHOT.jar");
-            PsiTestUtil.addLibrary(module, model, "groovy-all-2.4.6.jar", "/Users/bwatkins/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2016.2/585b4f969e1ca713c4eb3e9dbdb1f2cdf6a85172/ideaIC-2016.2/lib", "groovy-all-2.4.6.jar");
+            try {
+                addLibrary(module, model, getJarFileForClass(GroovyObject.class));
+                addLibrary(module, model, getJarFileForClass(SpecRunner.class));
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void addLibrary (Module module, ModifiableRootModel model, File jarFile) {
+        PsiTestUtil.addLibrary(module, model, jarFile.getName(), jarFile.getParent(), jarFile.getName());
+    }
+    
+    private File getJarFileForClass(Class sourceClass) throws URISyntaxException {
+        return new File(sourceClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
     }
 
     private RunnerAndConfigurationSettings produceRunnerAndConfigurationSettingsFor(String fixtureFile) {
