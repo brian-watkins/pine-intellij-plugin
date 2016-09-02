@@ -1,6 +1,6 @@
 <idea-plugin version="2">
   <id>org.pine.plugin.PineSpecPlugin</id>
-  <name>PineSpecPlugin</name>
+  <name>Pine Spec</name>
   <version>1.0</version>
   <vendor email="" url="https://github.com/bwatkinsPivotal/pine-intellij-plugin">Brian Watkins</vendor>
 

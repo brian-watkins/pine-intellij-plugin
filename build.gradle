@@ -14,7 +14,7 @@ apply plugin: 'java'
 intellij {
     version 'IC-2016.2'
     plugins 'JUnit', 'properties', 'groovy', 'gradle'
-    pluginName 'PineSpecPlugin'
+    pluginName 'Pine Spec'
 }
 
 group 'org.pine.plugin'
