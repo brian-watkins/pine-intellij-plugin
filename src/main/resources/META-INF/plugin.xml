@@ -22,4 +22,9 @@
     <runConfigurationProducer implementation="org.pine.plugin.PineSpecRunConfigurationProducer" order="first" />
   </extensions>
 
+  <extensions defaultExtensionNs="org.intellij.groovy">
+    <astTransformationSupport id="specDelegateSupport" order="after delegateSupport"
+                              implementation="org.pine.plugin.SpecDelegateTransformationSupport"/>
+  </extensions>
+
 </idea-plugin>

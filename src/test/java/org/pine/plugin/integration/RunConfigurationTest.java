@@ -26,7 +26,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RunConfigurationTest extends LightPlatformCodeInsightFixtureTestCase {
+public class RunConfigurationTest extends PineIntegrationTestCase {
 
     public void testConfiguresTheRunConfigurationFromAGroovyClass() {
         ExternalSystemRunConfiguration runConfiguration = produceRunConfigurationFor("SpecClass.groovy");
@@ -76,56 +76,20 @@ public class RunConfigurationTest extends LightPlatformCodeInsightFixtureTestCas
         assertThat(runConfiguration).isNull();
     }
 
-    @Override
-    protected String getTestDataPath() {
-        return new File("src/test/resources/integrationTestData").getAbsolutePath();
-    }
-
-    @Override
-    protected LightProjectDescriptor getProjectDescriptor() {
-        return new PineTestProjectDescriptor();
-    }
-
-    class PineTestProjectDescriptor extends DefaultLightProjectDescriptor {
-
-        @Override
-        public Sdk getSdk() {
-            return IdeaTestUtil.getMockJdk18();
-        }
-
-        @Override
-        public void configureModule(@NotNull Module module, @NotNull ModifiableRootModel model, @NotNull ContentEntry contentEntry) {
-            super.configureModule(module, model, contentEntry);
-
-            contentEntry.addSourceFolder("temp:///src/test", true);
-
-            GradleSystemRunningSettings.getInstance().setPreferredTestRunner(GradleSystemRunningSettings.PreferredTestRunner.GRADLE_TEST_RUNNER);
-
-            try {
-                addLibrary(module, model, getJarFileForClass(GroovyObject.class));
-                addLibrary(module, model, getJarFileForClass(SpecRunner.class));
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void addLibrary (Module module, ModifiableRootModel model, File jarFile) {
-        PsiTestUtil.addLibrary(module, model, jarFile.getName(), jarFile.getParent(), jarFile.getName());
-    }
-    
-    private File getJarFileForClass(Class sourceClass) throws URISyntaxException {
-        return new File(sourceClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-    }
 
     private RunnerAndConfigurationSettings produceRunnerAndConfigurationSettingsFor(String fixtureFile) {
-        VirtualFile file = myFixture.copyFileToProject(fixtureFile, "/test/groovy/org/pine/plugin/test/" + fixtureFile);
+        String testFixture = runConfigurationTestFixture(fixtureFile);
+        VirtualFile file = myFixture.copyFileToProject(testFixture, "/test/groovy/org/pine/plugin/test/" + fixtureFile);
         myFixture.configureFromExistingVirtualFile(file);
 
         PsiElement elementAtCaret = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
         ConfigurationContext configurationContext = new ConfigurationContext(elementAtCaret);
 
         return configurationContext.getConfiguration();
+    }
+
+    private String runConfigurationTestFixture(String fixtureFile) {
+        return "/runConfigurationTestData/" + fixtureFile;
     }
 
     private ExternalSystemRunConfiguration produceRunConfigurationFor(String fixtureFile) {
@@ -139,7 +103,8 @@ public class RunConfigurationTest extends LightPlatformCodeInsightFixtureTestCas
     }
 
     private ExternalSystemRunConfiguration findExistingRunConfigurationFor(String fixtureFile) {
-        VirtualFile file = myFixture.copyFileToProject(fixtureFile, "/test/groovy/org/pine/plugin/test/" + fixtureFile);
+        String testFixture = runConfigurationTestFixture(fixtureFile);
+        VirtualFile file = myFixture.copyFileToProject(testFixture, "/test/groovy/org/pine/plugin/test/" + fixtureFile);
         myFixture.configureFromExistingVirtualFile(file);
 
         PsiElement elementAtCaret = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
