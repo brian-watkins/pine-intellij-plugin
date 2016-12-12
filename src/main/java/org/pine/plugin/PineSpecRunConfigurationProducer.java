@@ -99,8 +99,13 @@ public class PineSpecRunConfigurationProducer extends GradleTestRunConfiguration
 
     private boolean isSpecClass(PsiClass sourceClass) {
         return Arrays.stream(sourceClass.getInterfaces())
-                .filter(c -> c.getQualifiedName().equals("org.pine.Spec"))
+                .filter(c -> isSpecType(c.getQualifiedName()))
                 .findFirst().isPresent();
+    }
+
+    private boolean isSpecType(String interfaceType) {
+        return interfaceType.equals("org.pine.Spec") ||
+                interfaceType.equals("org.pine.JourneySpec");
     }
 
 }

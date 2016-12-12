@@ -43,6 +43,11 @@ public class RunConfigurationTest extends PineIntegrationTestCase {
         assertRunConfigurationIsValid(runConfiguration, "org.pine.plugin.test.FunScript.when things are the case, and the time is right, it runs a spec");
     }
 
+    public void testConfiguresTheRunConfigurationFromAJourneySpec() {
+        ExternalSystemRunConfiguration runConfiguration = produceRunConfigurationFor("FunJourneySpecScript.groovy");
+        assertRunConfigurationIsValid(runConfiguration, "org.pine.plugin.test.FunJourneySpecScript.A journey through the app");
+    }
+
     public void testRecognizesConfiguration() {
         RunnerAndConfigurationSettings initialRunConfigSettings = produceRunnerAndConfigurationSettingsFor("FunScript.groovy");
 
@@ -75,7 +80,6 @@ public class RunConfigurationTest extends PineIntegrationTestCase {
         ExternalSystemRunConfiguration runConfiguration = produceRunConfigurationFor("NotGroovy.java");
         assertThat(runConfiguration).isNull();
     }
-
 
     private RunnerAndConfigurationSettings produceRunnerAndConfigurationSettingsFor(String fixtureFile) {
         String testFixture = runConfigurationTestFixture(fixtureFile);
