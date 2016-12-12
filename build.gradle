@@ -12,7 +12,7 @@ apply plugin: 'idea'
 apply plugin: 'java'
 
 intellij {
-    version 'IC-2016.2'
+    version 'IC-2016.3'
     plugins 'JUnit', 'properties', 'groovy', 'gradle'
     pluginName 'Pine Spec'
 }
