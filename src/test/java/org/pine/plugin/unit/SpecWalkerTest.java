@@ -2,7 +2,11 @@ package org.pine.plugin.unit;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.pine.plugin.*;
+import org.pine.plugin.visitor.SpecVisitor;
+import org.pine.plugin.walker.SpecMethod;
+import org.pine.plugin.walker.SpecMethodEnumerator;
+import org.pine.plugin.walker.SpecMethodType;
+import org.pine.plugin.walker.SpecWalker;
 
 import static org.mockito.Mockito.*;
 
@@ -14,16 +18,16 @@ public class SpecWalkerTest {
 
     @Before
     public void setup() {
-        specWalker = new SpecWalker(mockSpecVisitor);
+        specWalker = new SpecWalker(specMethodEnumerator);
     }
 
     @Test
-    public void itNotifiesVisitWhenFindingIt () {
+    public void itNotifiesVisitorWhenFindingIt () {
         SpecMethod itMethod = createMethod(SpecMethodType.IT, "does stuff");
 
         when(specMethodEnumerator.nextSpecMethod()).thenReturn(itMethod).thenReturn(null);
 
-        specWalker.walkSpecWithEnumerator(specMethodEnumerator);
+        specWalker.accept(mockSpecVisitor);
 
         verify(mockSpecVisitor).foundIt("does stuff");
     }
@@ -34,9 +38,20 @@ public class SpecWalkerTest {
 
         when(specMethodEnumerator.nextSpecMethod()).thenReturn(whenMethod).thenReturn(null);
 
-        specWalker.walkSpecWithEnumerator(specMethodEnumerator);
+        specWalker.accept(mockSpecVisitor);
 
         verify(mockSpecVisitor).foundWhen("things are the case");
+    }
+
+    @Test
+    public void itNotifiesVisitorWhenFindingDescribe () {
+        SpecMethod describeMethod = createMethod(SpecMethodType.DESCRIBE, "Fun Journey");
+
+        when(specMethodEnumerator.nextSpecMethod()).thenReturn(describeMethod).thenReturn(null);
+
+        specWalker.accept(mockSpecVisitor);
+
+        verify(mockSpecVisitor).foundDescribe("Fun Journey");
     }
 
     @Test
@@ -47,7 +62,7 @@ public class SpecWalkerTest {
 
         when(specMethodEnumerator.nextSpecMethod()).thenReturn(method1, method2, method3, null);
 
-        specWalker.walkSpecWithEnumerator(specMethodEnumerator);
+        specWalker.accept(mockSpecVisitor);
 
         verify(mockSpecVisitor).foundIt("does stuff");
         verify(mockSpecVisitor).foundWhen("things are the case");

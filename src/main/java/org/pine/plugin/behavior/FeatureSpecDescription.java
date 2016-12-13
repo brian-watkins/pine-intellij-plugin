@@ -1,4 +1,4 @@
-package org.pine.plugin;
+package org.pine.plugin.behavior;
 
 import com.intellij.psi.PsiClass;
 import org.apache.commons.lang.StringUtils;
@@ -6,11 +6,14 @@ import org.apache.commons.lang.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BehaviorDescription implements SpecVisitor {
-
+public class FeatureSpecDescription implements BehaviorDescription {
     private PsiClass specClass;
     private String behavior;
     private List<String> contexts = new ArrayList<>();
+
+    public FeatureSpecDescription (PsiClass specClass) {
+        this.specClass = specClass;
+    }
 
     public String getQualifiedName() {
         StringBuffer buffer = new StringBuffer();
@@ -44,21 +47,11 @@ public class BehaviorDescription implements SpecVisitor {
         }
     }
 
-    @Override
-    public void foundIt(String name) {
-        behavior = name;
+    public void addContext (String context) {
+        contexts.add(0, context);
     }
 
-    @Override
-    public void foundWhen(String name) {
-        contexts.add(0, name);
-    }
-
-    public PsiClass getSpecClass() {
-        return specClass;
-    }
-
-    public void setSpecClass(PsiClass specClass) {
-        this.specClass = specClass;
+    public void setBehavior(String behavior) {
+        this.behavior = behavior;
     }
 }

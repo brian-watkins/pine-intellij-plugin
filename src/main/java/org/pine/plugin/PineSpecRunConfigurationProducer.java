@@ -10,10 +10,19 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.plugins.gradle.execution.test.runner.GradleTestRunConfigurationProducer;
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType;
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
+import org.pine.plugin.behavior.BehaviorDescription;
+import org.pine.plugin.visitor.FeatureSpecVisitor;
+import org.pine.plugin.visitor.JourneySpecVisitor;
+import org.pine.plugin.visitor.SpecVisitor;
+import org.pine.plugin.walker.SpecMethodEnumerator;
+import org.pine.plugin.walker.SpecWalker;
 
 import java.util.Arrays;
 
 public class PineSpecRunConfigurationProducer extends GradleTestRunConfigurationProducer {
+
+    private static final String SPEC_CLASS_NAME = "org.pine.Spec";
+    private static final String JOURNEY_SPEC_CLASS_NAME = "org.pine.JourneySpec";
 
     public PineSpecRunConfigurationProducer() {
         super(GradleExternalTaskConfigurationType.getInstance());
@@ -27,11 +36,14 @@ public class PineSpecRunConfigurationProducer extends GradleTestRunConfiguration
             return false;
         }
 
-        if (!implementsSpec(sourceClass)) {
+        String specType = findSpecType(sourceClass);
+        if (specType == null) {
             return false;
         }
 
-        configureRunConfiguration(configuration, context.getModule(), sourceClass, sourceElement.get());
+        SpecVisitor visitor = getSpecVisitor(specType, sourceClass);
+
+        configureRunConfiguration(configuration, context.getModule(), visitor, sourceElement.get());
 
         return true;
     }
@@ -46,17 +58,20 @@ public class PineSpecRunConfigurationProducer extends GradleTestRunConfiguration
             return false;
         }
 
-        if (!implementsSpec(sourceClass)) {
+        String specType = findSpecType(sourceClass);
+        if (specType == null) {
             return false;
         }
 
-        BehaviorDescription behaviorDescription = getBehaviorDescription(sourceClass, sourceElement);
+        SpecVisitor visitor = getSpecVisitor(specType, sourceClass);
+
+        BehaviorDescription behaviorDescription = getBehaviorDescription(visitor, sourceElement);
 
         return behaviorDescription.getQualifiedName().equals(configuration.getName());
     }
 
-    private void configureRunConfiguration (ExternalSystemRunConfiguration configuration, Module module, PsiClass sourceClass, PsiElement sourceElement) {
-        BehaviorDescription behaviorDescription = getBehaviorDescription(sourceClass, sourceElement);
+    private void configureRunConfiguration (ExternalSystemRunConfiguration configuration, Module module, SpecVisitor visitor, PsiElement sourceElement) {
+        BehaviorDescription behaviorDescription = getBehaviorDescription(visitor, sourceElement);
 
         configuration.setName(behaviorDescription.getQualifiedName());
         configuration.getSettings().setExternalProjectPath(module.getProject().getBasePath());
@@ -64,14 +79,19 @@ public class PineSpecRunConfigurationProducer extends GradleTestRunConfiguration
         configuration.getSettings().setScriptParameters("--tests \"" + behaviorDescription.getQualifiedName() + "\"");
     }
 
-    private BehaviorDescription getBehaviorDescription(PsiClass sourceClass, PsiElement sourceElement) {
-        BehaviorDescription behaviorDescription = new BehaviorDescription();
-        behaviorDescription.setSpecClass(sourceClass);
+    private SpecVisitor getSpecVisitor (String specType, PsiClass specClass) {
+        if (JOURNEY_SPEC_CLASS_NAME.equals(specType)) {
+            return new JourneySpecVisitor(specClass);
+        }
 
-        SpecWalker specWalker = new SpecWalker(behaviorDescription);
-        specWalker.walkSpecWithEnumerator(new SpecMethodEnumerator(sourceElement));
+        return new FeatureSpecVisitor(specClass);
+    }
 
-        return behaviorDescription;
+    private BehaviorDescription getBehaviorDescription(SpecVisitor visitor, PsiElement sourceElement) {
+        SpecWalker specWalker = new SpecWalker(new SpecMethodEnumerator(sourceElement));
+        specWalker.accept(visitor);
+
+        return visitor.getBehaviorDescription();
     }
 
     private PsiClass findClassForElement(PsiElement sourceElement) {
@@ -84,23 +104,31 @@ public class PineSpecRunConfigurationProducer extends GradleTestRunConfiguration
         return PsiTreeUtil.getParentOfType(sourceElement, PsiClass.class);
     }
 
-    private boolean implementsSpec (PsiClass sourceClass) {
+    private String findSpecType(PsiClass sourceClass) {
         PsiClass ancestorClass = sourceClass;
         while (ancestorClass != null) {
-            if (isSpecClass(ancestorClass)) {
-                return true;
+            String specClass = getSpecType(ancestorClass);
+            if (specClass != null) {
+                return specClass;
             } else {
                 ancestorClass = ancestorClass.getSuperClass();
             }
         }
 
-        return false;
+        return null;
     }
 
-    private boolean isSpecClass(PsiClass sourceClass) {
+    private String getSpecType(PsiClass sourceClass) {
         return Arrays.stream(sourceClass.getInterfaces())
-                .filter(c -> c.getQualifiedName().equals("org.pine.Spec"))
-                .findFirst().isPresent();
+                .filter(c -> isSpecType(c.getQualifiedName()))
+                .findFirst()
+                .map(c -> c.getQualifiedName())
+                .orElse(null);
+    }
+
+    private boolean isSpecType(String interfaceType) {
+        return interfaceType.equals(SPEC_CLASS_NAME) ||
+                interfaceType.equals(JOURNEY_SPEC_CLASS_NAME);
     }
 
 }

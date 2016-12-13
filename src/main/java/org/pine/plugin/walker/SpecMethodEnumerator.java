@@ -1,4 +1,4 @@
-package org.pine.plugin;
+package org.pine.plugin.walker;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -40,6 +40,8 @@ public class SpecMethodEnumerator {
             return SpecMethodType.IT;
         } else if (methodName.equals("when")) {
             return SpecMethodType.WHEN;
+        } else if (methodName.equals("describe")) {
+            return SpecMethodType.DESCRIBE;
         }
 
         return null;

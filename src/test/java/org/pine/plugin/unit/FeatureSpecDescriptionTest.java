@@ -3,15 +3,15 @@ package org.pine.plugin.unit;
 import com.intellij.psi.PsiClass;
 import org.junit.Before;
 import org.junit.Test;
-import org.pine.plugin.BehaviorDescription;
+import org.pine.plugin.behavior.FeatureSpecDescription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BehaviorDescriptionTest {
+public class FeatureSpecDescriptionTest {
 
-    BehaviorDescription description;
+    FeatureSpecDescription description;
     String className = "org.test.example.ExampleSpec";
 
     @Before
@@ -19,46 +19,45 @@ public class BehaviorDescriptionTest {
         PsiClass mockPsiClass = mock(PsiClass.class);
         when(mockPsiClass.getQualifiedName()).thenReturn(className);
 
-        description = new BehaviorDescription();
-        description.setSpecClass(mockPsiClass);
+        description = new FeatureSpecDescription(mockPsiClass);
     }
 
     @Test
     public void itFindsTheNameOfABehaviorWhenThereIsNoClassSet () {
-        description.setSpecClass(null);
-        description.foundIt("does stuff");
+        FeatureSpecDescription emptyDescription = new FeatureSpecDescription(null);
+        emptyDescription.setBehavior("does stuff");
 
-        assertThat(description.getQualifiedName()).isEqualTo("it does stuff");
+        assertThat(emptyDescription.getQualifiedName()).isEqualTo("it does stuff");
     }
 
     @Test
     public void itFindsTheNameOfASimpleBehavior () {
-        description.foundIt("does stuff");
+        description.setBehavior("does stuff");
 
         assertThat(description.getQualifiedName()).isEqualTo(className + ".it does stuff");
     }
 
     @Test
     public void itFindsTheNameOfABehaviorInAContext () {
-        description.foundIt("does stuff");
-        description.foundWhen("things are the case");
+        description.setBehavior("does stuff");
+        description.addContext("things are the case");
 
         assertThat(description.getQualifiedName()).isEqualTo(className + ".when things are the case, it does stuff");
     }
 
     @Test
     public void itFindsTheNameOfAContext () {
-        description.foundWhen("things are the case");
+        description.addContext("things are the case");
 
         assertThat(description.getQualifiedName()).isEqualTo(className + ".when things are the case, *");
     }
 
     @Test
     public void itFindsTheNameOfABehaviorInMultipleContexts() {
-        description.foundIt("does stuff");
-        description.foundWhen("things are the case");
-        description.foundWhen("something happened");
-        description.foundWhen("the time is right");
+        description.setBehavior("does stuff");
+        description.addContext("things are the case");
+        description.addContext("something happened");
+        description.addContext("the time is right");
 
         assertThat(description.getQualifiedName()).isEqualTo(className + ".when the time is right, and something happened, and things are the case, it does stuff");
     }

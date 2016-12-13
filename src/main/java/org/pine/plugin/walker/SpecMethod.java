@@ -1,4 +1,4 @@
-package org.pine.plugin;
+package org.pine.plugin.walker;
 
 public class SpecMethod {
 
