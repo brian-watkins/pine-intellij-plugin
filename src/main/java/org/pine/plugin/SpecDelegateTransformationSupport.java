@@ -32,7 +32,7 @@ public class SpecDelegateTransformationSupport implements AstTransformationSuppo
         if (codeClassDefinition instanceof GroovyScriptClass) {
             applyTransformation(transformationContext, (GroovyScriptClass) codeClassDefinition);
         }
-        else {
+        else if (codeClassDefinition instanceof GrClassDefinition) {
             applyTransformation(transformationContext, (GrClassDefinition) codeClassDefinition);
         }
     }

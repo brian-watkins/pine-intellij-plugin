@@ -68,6 +68,12 @@ public class SpecDelegateTransformationSupportTest extends PineIntegrationTestCa
         assertReferenceResolvesDelegatedMethod("MagicDelegate", "doSomethingMagical");
     }
 
+    public void testTraitResolvesAsExpected() {
+        configureWithFile("MyTrait.groovy");
+        assertReferenceResolves();
+    }
+
+
     private String specDelegateTestFixture(String fixtureFile) {
         return "/specDelegateTestData/" + fixtureFile;
     }
