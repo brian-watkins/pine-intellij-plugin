@@ -21,6 +21,7 @@ public class JourneySpecDescription implements BehaviorDescription {
         buffer.append(journeySpecClass.getQualifiedName()).append(".");
         buffer.append(journeyName);
         appendContextDescription(buffer);
+        buffer.append("*");
 
         return buffer.toString();
     }
@@ -29,7 +30,6 @@ public class JourneySpecDescription implements BehaviorDescription {
         if (contexts.size() > 0) {
             buffer.append(", when ");
             buffer.append(StringUtils.join(contexts, ", and "));
-            buffer.append("*");
         }
     }
 
