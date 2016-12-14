@@ -21,7 +21,7 @@ public class JourneySpecVisitor implements SpecVisitor {
 
     @Override
     public void foundWhen(String name) {
-
+        description.addContext(name);
     }
 
     @Override

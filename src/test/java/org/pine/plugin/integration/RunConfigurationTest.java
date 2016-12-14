@@ -48,6 +48,11 @@ public class RunConfigurationTest extends PineIntegrationTestCase {
         assertRunConfigurationIsValid(runConfiguration, "org.pine.plugin.test.FunJourneySpecScript.A journey through the app");
     }
 
+    public void testConfiguresTheRunConfigurationFromAJourneySpecWithWhenBlocks() {
+        ExternalSystemRunConfiguration runConfiguration = produceRunConfigurationFor("FunJourneySpecWithWhen.groovy");
+        assertRunConfigurationIsValid(runConfiguration, "org.pine.plugin.test.FunJourneySpecWithWhen.A journey through the app with whens, when something happens, and another thing happens*");
+    }
+
     public void testRecognizesConfiguration() {
         RunnerAndConfigurationSettings initialRunConfigSettings = produceRunnerAndConfigurationSettingsFor("FunScript.groovy");
 
