@@ -1,7 +1,10 @@
 package org.pine.plugin;
 
 import com.intellij.execution.actions.ConfigurationContext;
+import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.openapi.externalSystem.service.execution.ExternalSystemRunConfiguration;
+import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil;
+import com.intellij.openapi.externalSystem.util.ExternalSystemUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiClass;
@@ -9,6 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.plugins.gradle.execution.test.runner.GradleTestRunConfigurationProducer;
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType;
+import org.jetbrains.plugins.gradle.util.GradleConstants;
 import org.jetbrains.plugins.groovy.lang.psi.GroovyFile;
 import org.pine.plugin.behavior.BehaviorDescription;
 import org.pine.plugin.visitor.FeatureSpecVisitor;
@@ -17,7 +21,9 @@ import org.pine.plugin.visitor.SpecVisitor;
 import org.pine.plugin.walker.SpecMethodEnumerator;
 import org.pine.plugin.walker.SpecWalker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class PineSpecRunConfigurationProducer extends GradleTestRunConfigurationProducer {
 
@@ -26,6 +32,10 @@ public class PineSpecRunConfigurationProducer extends GradleTestRunConfiguration
 
     public PineSpecRunConfigurationProducer() {
         super(GradleExternalTaskConfigurationType.getInstance());
+    }
+
+    public PineSpecRunConfigurationProducer(ConfigurationType configurationType) {
+        super(configurationType);
     }
 
     @Override
@@ -70,13 +80,17 @@ public class PineSpecRunConfigurationProducer extends GradleTestRunConfiguration
         return behaviorDescription.getQualifiedName().equals(configuration.getName());
     }
 
-    private void configureRunConfiguration (ExternalSystemRunConfiguration configuration, Module module, SpecVisitor visitor, PsiElement sourceElement) {
+    protected void configureRunConfiguration (ExternalSystemRunConfiguration configuration, Module module, SpecVisitor visitor, PsiElement sourceElement) {
         BehaviorDescription behaviorDescription = getBehaviorDescription(visitor, sourceElement);
 
         configuration.setName(behaviorDescription.getQualifiedName());
-        configuration.getSettings().setExternalProjectPath(module.getProject().getBasePath());
-        configuration.getSettings().setTaskNames(Arrays.asList(":cleanTest", ":test"));
+        configuration.getSettings().setExternalProjectPath(resolveProjectPath(module));
+        configuration.getSettings().setTaskNames(getTasksFromGradleRunTestConfigurationProducer(module));
         configuration.getSettings().setScriptParameters("--tests \"" + behaviorDescription.getQualifiedName() + "\"");
+    }
+
+    protected List<String> getTasksFromGradleRunTestConfigurationProducer(Module module) {
+        return getTasksToRun(module);
     }
 
     private SpecVisitor getSpecVisitor (String specType, PsiClass specClass) {

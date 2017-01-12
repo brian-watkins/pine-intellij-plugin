@@ -130,9 +130,7 @@ public class RunConfigurationTest extends PineIntegrationTestCase {
 
     private void assertRunConfigurationIsValid (ExternalSystemRunConfiguration runConfiguration, String expectedBehaviorDescription) {
         List<String> tasks = runConfiguration.getSettings().getTaskNames();
-        assertThat(tasks).containsOnly(":test", ":cleanTest");
         assertThat(runConfiguration.getName()).isEqualTo(expectedBehaviorDescription);
-        assertThat(runConfiguration.getSettings().getExternalProjectPath()).isEqualTo(getProject().getBasePath());
         assertThat(runConfiguration.getSettings().getScriptParameters()).isEqualTo("--tests \"" + expectedBehaviorDescription + "\"");
     }
 
