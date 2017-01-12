@@ -7,10 +7,10 @@ import org.pine.annotation.SpecDelegate
 
 @BaseScript SpecScript spec
 
+@Field String somethingElse = "Blah"
+
 @SpecDelegate
 @Field MagicDelegate magicDelegate = new MagicDelegate()
-
-@Field String somethingElse = "Blah"
 
 describe 'MySystem', {
 

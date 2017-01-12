@@ -9,6 +9,8 @@ import org.pine.annotation.SpecDelegate
 @RunWith(SpecRunner)
 class FunSpec implements Spec {
 
+    String someOtherField = "something"
+
     @SpecDelegate
     MagicDelegate magicDelegate = new MagicDelegate()
 

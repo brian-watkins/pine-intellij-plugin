@@ -40,7 +40,7 @@ public class SpecDelegateTransformationSupport implements AstTransformationSuppo
     private void applyTransformation(TransformationContext context, GrClassDefinition groovyClass) {
         for (GrField field : groovyClass.getCodeFields()) {
             final PsiAnnotation annotation = PsiImplUtil.getAnnotation(field, SPECDELEGATE_ANNOTATION);
-            if (annotation == null) return;
+            if (annotation == null) continue;
 
             applyTransformation(context, field.getDeclaredType());
         }
