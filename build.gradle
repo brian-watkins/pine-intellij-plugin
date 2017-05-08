@@ -18,14 +18,16 @@ intellij {
 }
 
 group 'org.pine.plugin'
-version '0.1'
+version '1.0'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile(fileTree(dir: 'lib', include: '*.jar'))
+    testCompile(group: 'com.github.brian-watkins', name: 'pine', version: '1.1.0') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.5.2'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
 }
