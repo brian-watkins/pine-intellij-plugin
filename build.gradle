@@ -5,20 +5,20 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "0.1.10"
+    id "org.jetbrains.intellij" version "0.2.17"
 }
 
 apply plugin: 'idea'
 apply plugin: 'java'
 
 intellij {
-    version 'IC-2016.3'
+    version 'IC-2017.2'
     plugins 'JUnit', 'properties', 'groovy', 'gradle'
     pluginName 'PineSpec'
 }
 
 group 'org.pine.plugin'
-version '1.0'
+version '1.0.1'
 
 repositories {
     mavenCentral()
